@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+import { useState } from 'react';
 import {
   Container,
   Card,
@@ -65,7 +65,7 @@ const SavedBooks = () => {
         <Row>
   {userData.savedBooks.map((book) => {
     return (
-      <Col md="4" key={book.bookId}> {/* Add key prop here */}
+      <Col md="4" key={book.bookId}> 
         <Card border='dark'>
           {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}
           <Card.Body>
