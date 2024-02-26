@@ -22,9 +22,8 @@
 
 // module 21 activity 1
 const express = require('express');
-// Import the ApolloServer class
-const { ApolloServer } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4');
+// Import the ApolloServer class, debugging to get server started
+const { ApolloServer } = require('apollo-server-express');
 
 // Import the two parts of a GraphQL schema
 const { typeDefs, resolvers } = require('./schemas');
@@ -42,10 +41,8 @@ const app = express();
 const startApolloServer = async () => {
   await server.start();
   
-  app.use(express.urlencoded({ extended: false }));
-  app.use(express.json());
-  
-  app.use('/graphql', expressMiddleware(server));
+  // debugging test
+  server.applyMiddleware({ app });
 
   db.once('open', () => {
     app.listen(PORT, () => {
