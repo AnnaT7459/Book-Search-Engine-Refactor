@@ -5,14 +5,14 @@ const { signToken, AuthenticationError } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    // Query to retrieve all users
-    users: async () => {
-      return User.find();
-    },
-
-    // Query to retrieve a single user by ID
-    user: async (parent, { userId }) => {
-      return User.findById(userId);
+    // Query to retrieve the currently logged-in user
+    me: async (parent, args, context) => {
+      // Check if the user is authenticated
+      if (!context.user) {
+        throw new AuthenticationError('You are not logged in');
+      }
+      // Return the authenticated user
+      return context.user;
     },
   },
 
@@ -46,13 +46,8 @@ const resolvers = {
       );
     },
 
-    // Mutation to remove a user
-    removeUser: async (parent, { userId }) => {
-      return User.findByIdAndDelete(userId);
-    },
-
     // Mutation to remove a book from a user's saved books
-    deleteBook: async (parent, { userId, bookId }) => {
+    removeBook: async (parent, { userId, bookId }) => {
       return User.findByIdAndUpdate(
         userId,
         { $pull: { savedBooks: { bookId } } },
