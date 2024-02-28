@@ -19,7 +19,6 @@ const SavedBooks = () => {
   // Use useQuery hook to execute GET_ME query
   const { loading, data } = useQuery(GET_ME);
   const [removeBook, {error}] = useMutation(REMOVE_BOOK);
-
   const userData = data?.me || {}; 
 
 

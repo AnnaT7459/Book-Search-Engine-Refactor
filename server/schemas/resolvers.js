@@ -6,7 +6,7 @@ const { signToken, AuthenticationError } = require('../utils/auth');
 const resolvers = {
   Query: {
     // Query to retrieve the currently logged-in user
-    me: async (parent, args, context) => {
+    me: async (_, args, context) => {
       // Check if the user is authenticated
       if (!context.user) {
         throw new AuthenticationError('You are not logged in');
@@ -18,15 +18,16 @@ const resolvers = {
 
   Mutation: {
     // Mutation to add a new user
-    addUser: async (parent, { username, email, password }) => {
-      const user = await User.create({ username, email, password });
-      const token = signToken(user);
-
-      return { token, user };
-    },
+      addUser: async (_, { input }) => {
+        const { username, email, password } = input;
+        const user = await User.create({ username, email, password });
+        const token = signToken(user);
+        return { token, user };
+      },
 
     // Mutation for user login
-    loginUser: async (parent, { email, password }) => {
+    login: async (_, { input }) => {
+      const { email, password } = input;
       const user = await User.findOne({ email });
 
       if (!user || !user.isCorrectPassword(password)) {
@@ -38,21 +39,31 @@ const resolvers = {
     },
 
     // Mutation to save a book to a user's saved books
-    saveBook: async (parent, { userId, book }) => {
-      return User.findByIdAndUpdate(
+    saveBook: async (_, { input }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError('You are not logged in');
+      }
+      const { userId, book } = input;
+      const updatedUser = await User.findByIdAndUpdate(
         userId,
         { $addToSet: { savedBooks: book } },
         { new: true, runValidators: true }
       );
+      return updatedUser;
     },
 
     // Mutation to remove a book from a user's saved books
-    removeBook: async (parent, { userId, bookId }) => {
-      return User.findByIdAndUpdate(
+    removeBook: async (_, { input }, context) => {
+      if (!context.user) {
+        throw new AuthenticationError('You are not logged in');
+      }
+      const { userId, bookId } = input;
+      const updatedUser = await User.findByIdAndUpdate(
         userId,
         { $pull: { savedBooks: { bookId } } },
         { new: true }
       );
+      return updatedUser;
     },
   },
 };
