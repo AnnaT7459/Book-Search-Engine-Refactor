@@ -18,11 +18,10 @@ import { removeBookId } from '../utils/localStorage';
 const SavedBooks = () => {
   // Use useQuery hook to execute GET_ME query
   const { loading, data } = useQuery(GET_ME);
+  const [removeBook, {error}] = useMutation(REMOVE_BOOK);
 
-  const userData = data?.me || {}; // Extract user data from the query result
+  const userData = data?.me || {}; 
 
-  // Use useMutation hook to execute REMOVE_BOOK mutation
-  const [removeBook] = useMutation(REMOVE_BOOK);
 
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
@@ -33,7 +32,7 @@ const SavedBooks = () => {
 
     try {
       // Execute the REMOVE_BOOK mutation
-      await removeBook({
+      const { data } = await removeBook({
         variables: { bookId }
       });
 
@@ -61,7 +60,6 @@ const SavedBooks = () => {
             ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? 'book' : 'books'}:`
             : 'You have no saved books!'}
         </h2>
-        {/* missing key prop, added to each element rendered inside loop */}
         <Row>
   {userData.savedBooks.map((book) => {
     return (
